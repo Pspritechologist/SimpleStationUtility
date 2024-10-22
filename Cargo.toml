@@ -1,0 +1,20 @@
+[package]
+name = "simple_server_utility"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+lto = true
+strip = true
+
+[dependencies]
+clap = { version = "*", features = [ "derive" ] }
+hcloud = "*"
+tokio = { version = "*", features = [ "full" ] }
+human-panic = "*"
+tabled = "*"
+serde_json = "*"
+
+[build-dependencies]
+clap = { version = "*", features = [ "derive", "env" ] }
+clap_complete = "*"
