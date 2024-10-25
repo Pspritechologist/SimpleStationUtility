@@ -8,12 +8,14 @@ lto = true
 strip = true
 
 [dependencies]
-clap = { version = "*", features = [ "derive" ] }
-hcloud = "*"
+clap = { version = "*", features = [ "derive", "env" ] }
+hcloud = { git = "https://github.com/HenningHolmDE/hcloud-rust", features = [ "rustls-tls" ], default-features = false }
 tokio = { version = "*", features = [ "full" ] }
 human-panic = "*"
 tabled = "*"
 serde_json = "*"
+serde = { version = "*", features = [ "derive" ] }
+toml = "*"
 
 [build-dependencies]
 clap = { version = "*", features = [ "derive", "env" ] }

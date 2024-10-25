@@ -19,7 +19,15 @@ pub enum SubCommand {
 	Shutdown(CmdShutdown),
 	Startup(CmdStartup),
 	Rescale(CmdRescale),
+	NginxConfig(CmdNginxConfig),
+	#[cfg(debug_assertions)]
+	Debug(CmdDebug),
 }
+
+#[cfg(debug_assertions)]
+#[derive(Debug, Clone, clap::Parser)]
+#[command()]
+pub struct CmdDebug;
 
 #[derive(Debug, Clone, clap::Parser)]
 #[command(visible_alias="ls")]
@@ -102,6 +110,21 @@ pub struct CmdRescale {
 	/// 
 	/// Lists all compatible shapes if omitted.
 	pub shape: Option<u16>,
+}
+
+#[derive(Debug, Clone, clap::Parser)]
+#[command(alias="nginx")]
+/// Generates Nginx configuration files for SimpleStation servers.
+pub struct CmdNginxConfig {
+	#[arg(env="SSU_NGINX_CONFIG")]
+	/// The path to the TOML file containing the server configurations.
+	pub config: std::path::PathBuf,
+	/// The Nginx configuration file to write to.
+	/// 
+	/// NOTE: This is a destructive action. If the file already exists, it will be overwritten.
+	/// If omitted, the configuration will be printed to stdout.
+	#[arg(env="SSU_NGINX_OUTPUT")]
+	pub output: Option<std::path::PathBuf>,
 }
 
 #[test]

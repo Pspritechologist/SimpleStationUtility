@@ -1,5 +1,6 @@
 mod utils;
 mod cmd;
+mod nginx;
 
 use std::{borrow::Cow, io::Write, process::exit};
 
@@ -28,6 +29,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		cmd::SubCommand::Shutdown(args) => shutdown(args).await?,
 		cmd::SubCommand::Startup(args) => startup(args).await?,
 		cmd::SubCommand::Rescale(args) => rescale(args).await?,
+		cmd::SubCommand::NginxConfig(args) => nginx::generate_servers(args)?,
+		#[cfg(debug_assertions)]
+		cmd::SubCommand::Debug(_) => (),
 	}
 
 	Ok(())
