@@ -3,6 +3,9 @@ name = "simple_server_utility"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "ssu"
+
 [profile.release]
 lto = true
 strip = true

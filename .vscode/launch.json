@@ -7,15 +7,15 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Debug executable 'simple_server_utility'",
+			"name": "Debug executable 'ssu'",
 			"cargo": {
 				"args": [
 					"build",
-					"--bin=simple_server_utility",
+					"--bin=ssu",
 					"--package=simple_server_utility"
 				],
 				"filter": {
-					"name": "simple_server_utility",
+					"name": "ssu",
 					"kind": "bin"
 				}
 			},
@@ -25,16 +25,35 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Debug unit tests in executable 'simple_server_utility'",
+			"name": "Debug unit tests in library 'simple_server_utility'",
 			"cargo": {
 				"args": [
 					"test",
 					"--no-run",
-					"--bin=simple_server_utility",
+					"--lib",
 					"--package=simple_server_utility"
 				],
 				"filter": {
 					"name": "simple_server_utility",
+					"kind": "lib"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'ssu'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bin=ssu",
+					"--package=simple_server_utility"
+				],
+				"filter": {
+					"name": "ssu",
 					"kind": "bin"
 				}
 			},

@@ -1,43 +1,21 @@
+pub mod cmd;
+pub mod nginx;
+
 mod utils;
-mod cmd;
-mod nginx;
 
 use std::{borrow::Cow, io::Write, process::exit};
 
-use clap::Parser;
 use hcloud::apis::{self, servers_api};
 use utils::{NodeTable, ShapeTable};
 
 static CONFIG: utils::ConfigCell = utils::ConfigCell::new();
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-	human_panic::setup_panic!();
-
-	let args = cmd::CmdArgs::parse();
-
-	let token = if args.token_file {
-		std::fs::read_to_string(args.token)?.trim().to_string()
-	} else {
-		args.token
-	};
-
+/// This function must be called before any other operations are performed.
+pub fn set_config(token: String) {
 	CONFIG.set(utils::Configuration::default().with_access_token(token));
-	
-	match args.action {
-		cmd::SubCommand::List(args) => list(args).await,
-		cmd::SubCommand::Shutdown(args) => shutdown(args).await?,
-		cmd::SubCommand::Startup(args) => startup(args).await?,
-		cmd::SubCommand::Rescale(args) => rescale(args).await?,
-		cmd::SubCommand::NginxConfig(args) => nginx::generate_servers(args)?,
-		#[cfg(debug_assertions)]
-		cmd::SubCommand::Debug(_) => (),
-	}
-
-	Ok(())
 }
 
-async fn list(args: cmd::CmdList) {
+pub async fn list(args: cmd::CmdList) {
 	use cmd::NodeSortOpt::*;
 	let mut nodes = servers_api::list_servers(&CONFIG, Default::default()).await.unwrap().servers;
 	match args.sort {
@@ -85,7 +63,7 @@ async fn list(args: cmd::CmdList) {
 	}
 }
 
-async fn shutdown(args: cmd::CmdShutdown) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn shutdown(args: cmd::CmdShutdown) -> Result<(), Box<dyn std::error::Error>> {
 	let Some(id) = parse_node_id(Cow::Borrowed(&args.node)).await? else {
 		eprintln!("No node found with the name or ID '{}'", args.node);
 		exit(1);
@@ -103,7 +81,7 @@ async fn shutdown(args: cmd::CmdShutdown) -> Result<(), Box<dyn std::error::Erro
 	Ok(())
 }
 
-async fn startup(args: cmd::CmdStartup) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn startup(args: cmd::CmdStartup) -> Result<(), Box<dyn std::error::Error>> {
 	let Some(id) = parse_node_id(Cow::Borrowed(&args.node)).await? else {
 		eprintln!("No node found with the name or ID '{}'", args.node);
 		exit(1);
@@ -116,7 +94,7 @@ async fn startup(args: cmd::CmdStartup) -> Result<(), Box<dyn std::error::Error>
 	Ok(())
 }
 
-async fn rescale(args: cmd::CmdRescale) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn rescale(args: cmd::CmdRescale) -> Result<(), Box<dyn std::error::Error>> {
 	let Some(node_id) = parse_node_id(Cow::Borrowed(&args.node)).await? else {
 		eprintln!("No node found with the name or ID '{}'", args.node);
 		exit(1);
@@ -182,7 +160,7 @@ async fn rescale(args: cmd::CmdRescale) -> Result<(), Box<dyn std::error::Error>
 	Ok(())
 }
 
-async fn parse_node_id<'a>(node: Cow<'a, String>) -> Result<Option<i64>, Box<dyn std::error::Error>> {
+pub async fn parse_node_id<'a>(node: Cow<'a, String>) -> Result<Option<i64>, Box<dyn std::error::Error>> {
 	match node.parse() {
 		Ok(id) => Ok(Some(id)),
 		Err(_) => {
@@ -192,7 +170,7 @@ async fn parse_node_id<'a>(node: Cow<'a, String>) -> Result<Option<i64>, Box<dyn
 	}
 }
 
-async fn await_action(id: i64) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn await_action(id: i64) -> Result<(), Box<dyn std::error::Error>> {
 	println!("");
 	loop {
 		#[allow(deprecated)] // It says it'll be removed in 2023...
